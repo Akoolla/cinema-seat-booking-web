@@ -7,12 +7,18 @@
 * Where possible validation should occur client side
 * Mobile web first design approach, but should be responsive designa and look fine at higher resoloutions
 
-
-
 ## Epics
 * Browse and select a film screening
 * Reserve seats, see cost, make booking
 * Be able to cancle a booking
 * View list of bookings for a screening and check those bookings in by cinema staff
 * Reporting
+
+## TODO's
+
+1 Browse and select a film screening
+1 [] Define and use rest call to retreive number of available seats for booking
+2 [] Define and use rest call to retreive cost of seats for specfic screening
+3 [] Write jscript to update total cost of screening based on screening seat costs and seats booked
+4 [] Enable rest call to make booking, deal with issue of seats maybe being booked in the meantime
 
