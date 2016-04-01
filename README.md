@@ -17,8 +17,8 @@
 ## TODO's
 
 - Browse and select a film screening
-  - [] Define and use rest call to retreive number of available seats for booking
-  - [] Define and use rest call to retreive cost of seats for specfic screening
-  - [] Write jscript to update total cost of screening based on screening seat costs and seats booked
-  - [] Enable rest call to make booking, deal with issue of seats maybe being booked in the meantime
-
+  - [ ] Define and use rest call to retreive number of available seats for booking
+  - [ ] Define and use rest call to retreive cost of seats for specfic screening
+  - [ ] Write jscript to update total cost of screening based on screening seat costs and seats booked
+  - [ ] Enable rest call to make booking, deal with issue of seats maybe being booked in the meantime
+  - [x] Something I've done...
