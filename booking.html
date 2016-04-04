@@ -15,9 +15,13 @@
 
 <script>
 	var restService = "http://localhost:8080/";
-	var wheelChairPrice = 1;
+	var wheelChairPrice1;
 	var standardPrice;
 	var concessionCost;
+	
+	var wheelChairSpaces;
+	var standardSpaces;
+	var concessionSpaces;
 
 	$(function() {
 		$("#nav").load("nav.html");
@@ -76,7 +80,8 @@
 	
 	function updateTotalCost(){
 		var totalCost = 0;
-		totalCost = totalCost + $("#standard").val() * standardPrice;
+		totalCost = validateStandardSeats(totalCost);
+		
 		totalCost = totalCost + $("#wheelchairs").val() * wheelChairPrice;
 		totalCost = totalCost + $("#concessions").val() * concessionCost;
 
@@ -88,10 +93,34 @@
 		$("#costPence").append("." + pence);
 	}
 	
+	function validateStandardSeats(){
+		//check input is a number
+		$("#standardIcon")
+			.removeClass("hidden")
+			.removeClass("glyphicon-ok")
+			.removeClass("glyphicon-remove");
+				
+		if($.isNumeric($("#standard").val())){
+			$("#standardGrp").removeClass("has-error").addClass("has-success");
+			$("#standardIcon").addClass("glyphicon-ok");
+			
+			return $("#standard").val() * standardPrice;
+		} else {
+			$("#standardGrp").removeClass("has-success").addClass("has-error");
+			$("#standardIcon").addClass("glyphicon-remove");
+			
+			return 0;
+		}
+	}
+	
 	function populateScreeningData(data){
 		wheelChairPrice = data.screening.wheelChairPrice;
 		standardPrice = data.screening.standardPrice;
 		concessionCost = data.screening.concessionCost;
+		
+		wheelChairSpaces = data.screening.wheelChairSpaces;
+		standardSpaces = data.screening.standardSpaces;
+		concessionSpaces = data.screening.concessionSpaces;
 	}
 </script>
 </head>
@@ -131,10 +160,14 @@
 				</div>
 
 
-				<div class="form-group">
-					<label for="standard">Number of Standard Seats</label> <input
-						class="form-control" type="text" placeholder="No. Standard Seats"
-						id="standard" name="standard">
+				<div class="form-group has-feedback" id="standardGrp">
+					<label for="standard" class="control-label">Number of Standard Seats</label> <input
+						class="form-control" type="text" 
+						placeholder="No. Standard Seats" id="standard" name="standard" 
+						aria-describedby="standardSuccessStatus"> <span 
+						class="glyphicon glyphicon-ok form-control-feedback hidden"
+						aria-hidden="true" id="standardIcon"></span> 
+						<span id="standardSuccessStatus" class="sr-only">(success)</span>
 				</div>
 
 				<div class="form-group">
