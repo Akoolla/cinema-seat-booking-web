@@ -11,14 +11,22 @@
 <script src="js/jquery/jquery.form.min.js" charset="utf-8"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/validation.js"></script>
+<script src="js/bookings.js"></script>
 
 <script>
+	var restService = "http://localhost:8080/";
+	var wheelChairPrice = 1;
+	var standardPrice;
+	var concessionCost;
+
 	$(function() {
 		$("#nav").load("nav.html");
 	});
 
 	$(document).ready(
 			function() {
+				$("#nav").load("nav.html");
+
 				//Set-up add person form
 				var options = {
 					url : '/booking/make/',
@@ -47,7 +55,44 @@
 								$("#emailIcon").addClass("glyphicon-remove");
 							}
 						});
-			});
+				
+				$("#standard").on("change", function(){ updateTotalCost(); });
+				$("#wheelchairs").on("change", function(){ updateTotalCost(); });
+				$("#concessions").on("change", function(){ updateTotalCost(); });
+				
+				loadScreening();
+				});
+	
+	function loadScreening(){
+		$.ajax({
+			'url' : restService + 'screening/2131',
+			'success' : function(data) {
+				populateScreeningData(data);
+			},
+			'dataType' : 'jsonp',
+			'jsonp' : 'json.wrf'
+		});
+	}
+	
+	function updateTotalCost(){
+		var totalCost = 0;
+		totalCost = totalCost + $("#standard").val() * standardPrice;
+		totalCost = totalCost + $("#wheelchairs").val() * wheelChairPrice;
+		totalCost = totalCost + $("#concessions").val() * concessionCost;
+
+		pence = totalCost % 100;
+		pounds = (totalCost / 100) - (pence/100);
+		
+		$("#costPounds").val(pounds);
+		$("#costPence").empty();
+		$("#costPence").append("." + pence);
+	}
+	
+	function populateScreeningData(data){
+		wheelChairPrice = data.screening.wheelChairPrice;
+		standardPrice = data.screening.standardPrice;
+		concessionCost = data.screening.concessionCost;
+	}
 </script>
 </head>
 <body>
@@ -108,12 +153,13 @@
 				<div class="row">
 					<div class="col-xs-6">
 						<div class="form-group">
-							<label class="sr-only" for="exampleInputAmount">Amount
+							<label class="sr-only" for="exampleInputAmount">0
 								(in pounds)</label>
 							<div class="input-group">
 								<div class="input-group-addon">£</div>
-								<input type="text" class="form-control" id="exampleInputAmount" placeholder="Amount" readonly>
-								<div class="input-group-addon">.00</div>
+								<input type="text" class="form-control" id="costPounds"
+									placeholder="0" readonly>
+								<div class="input-group-addon" id="costPence">.00</div>
 							</div>
 						</div>
 					</div>
