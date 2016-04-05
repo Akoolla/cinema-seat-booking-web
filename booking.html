@@ -60,9 +60,9 @@
 							}
 						});
 				
-				$("#standard").on("change", function(){ updateTotalCost(); });
-				$("#wheelchairs").on("change", function(){ updateTotalCost(); });
-				$("#concessions").on("change", function(){ updateTotalCost(); });
+				$("#standard").on("change", function(){ validateSeats(); updateTotalCost();});
+				$("#wheelchairs").on("change", function(){ validateSeats(); updateTotalCost();});
+				$("#concessions").on("change", function(){ validateSeats(); updateTotalCost();});
 				
 				loadScreening();
 				});
@@ -78,12 +78,31 @@
 		});
 	}
 	
+	function validateSeats(){
+		var standardSeatsToBook = 0;
+		var wheelChairsToBook = 0;
+		
+		standardSeatsToBook = standardSeatsToBook + parseInt(($.isNumeric($("#standard").val()) ? $("#standard").val() : 0));
+		standardSeatsToBook = standardSeatsToBook + parseInt(($.isNumeric($("#concessions").val()) ? $("#concessions").val() : 0));
+		wheelChairsToBook = wheelChairsToBook + parseInt(($.isNumeric($("#wheelchairs").val()) ? $("#wheelchairs").val() : 0));
+		
+		setValidityOfSeat(($("#standard").val().length === 0 || $.isNumeric($("#standard").val())) && standardSeatsToBook <= standardSpaces, "standard");
+		setValidityOfSeat(($("#concessions").val().length === 0 || $.isNumeric($("#concessions").val())) && standardSeatsToBook <= standardSpaces, "concessions");
+		setValidityOfSeat(($("#wheelchairs").val().length === 0 || $.isNumeric($("#wheelchairs").val())) && wheelChairsToBook <= wheelChairSpaces, "wheelchairs");
+	}
+	
 	function updateTotalCost(){
 		var totalCost = 0;
-		totalCost = validateStandardSeats(totalCost);
-		
-		totalCost = totalCost + $("#wheelchairs").val() * wheelChairPrice;
-		totalCost = totalCost + $("#concessions").val() * concessionCost;
+
+		if($.isNumeric($("#standard").val())){
+			totalCost = totalCost + (parseInt($("#standard").val()) * standardPrice);
+		}
+		if($.isNumeric($("#wheelchairs").val())){
+			totalCost = totalCost + (parseInt($("#wheelchairs").val()) * wheelChairPrice);
+		}
+		if($.isNumeric($("#concessions").val())){
+			totalCost = totalCost + (parseInt($("#concessions").val()) * concessionCost);
+		}
 
 		pence = totalCost % 100;
 		pounds = (totalCost / 100) - (pence/100);
@@ -93,23 +112,18 @@
 		$("#costPence").append("." + pence);
 	}
 	
-	function validateStandardSeats(){
-		//check input is a number
-		$("#standardIcon")
+	function setValidityOfSeat(isValid, idPrefix){
+		$("#" + idPrefix + "Icon")
 			.removeClass("hidden")
 			.removeClass("glyphicon-ok")
 			.removeClass("glyphicon-remove");
 				
-		if($.isNumeric($("#standard").val())){
-			$("#standardGrp").removeClass("has-error").addClass("has-success");
-			$("#standardIcon").addClass("glyphicon-ok");
-			
-			return $("#standard").val() * standardPrice;
+		if(isValid){
+			$("#" + idPrefix + "Grp").removeClass("has-error").addClass("has-success");
+			$("#" + idPrefix + "Icon").addClass("glyphicon-ok");
 		} else {
-			$("#standardGrp").removeClass("has-success").addClass("has-error");
-			$("#standardIcon").addClass("glyphicon-remove");
-			
-			return 0;
+			$("#" + idPrefix + "Grp").removeClass("has-success").addClass("has-error");
+			$("#" + idPrefix + "Icon").addClass("glyphicon-remove");
 		}
 	}
 	
@@ -120,7 +134,6 @@
 		
 		wheelChairSpaces = data.screening.wheelChairSpaces;
 		standardSpaces = data.screening.standardSpaces;
-		concessionSpaces = data.screening.concessionSpaces;
 	}
 </script>
 </head>
@@ -163,25 +176,32 @@
 				<div class="form-group has-feedback" id="standardGrp">
 					<label for="standard" class="control-label">Number of Standard Seats</label> <input
 						class="form-control" type="text" 
-						placeholder="No. Standard Seats" id="standard" name="standard" 
+						placeholder="0" id="standard" name="standard" 
 						aria-describedby="standardSuccessStatus"> <span 
 						class="glyphicon glyphicon-ok form-control-feedback hidden"
 						aria-hidden="true" id="standardIcon"></span> 
 						<span id="standardSuccessStatus" class="sr-only">(success)</span>
 				</div>
 
-				<div class="form-group">
-					<label for="concessions">Number of Concession Seats</label> <input
-						class="form-control" type="text" placeholder="No. Concessions"
-						id="concessions" name="concessions">
+				<div class="form-group has-feedback" id="concessionsGrp">
+					<label for="concessions" class="control-label">Number of Concession Seats</label> <input
+						class="form-control" type="text" 
+						placeholder="0" id="concessions" name="concessions" 
+						aria-describedby="concessionsSuccessStatus"> <span 
+						class="glyphicon glyphicon-ok form-control-feedback hidden"
+						aria-hidden="true" id="concessionsIcon"></span> 
+						<span id="concessionsSuccessStatus" class="sr-only">(success)</span>
 				</div>
-
-				<div class="form-group">
-					<label for="wheelchairs">Number of Wheelchairs</label> <input
-						class="form-control" type="text" placeholder="No. Wheelchairs"
-						id="wheelchairs" name="wheelchairs">
+				
+				<div class="form-group has-feedback" id="wheelchairsGrp">
+					<label for="wheelchairs" class="control-label">Number of Wheelchairs</label> <input
+						class="form-control" type="text" 
+						placeholder="0" id="wheelchairs" name="wheelchairs" 
+						aria-describedby="wheelchairsSuccessStatus"> <span 
+						class="glyphicon glyphicon-ok form-control-feedback hidden"
+						aria-hidden="true" id="wheelchairsIcon"></span> 
+						<span id="wheelchairsSuccessStatus" class="sr-only">(success)</span>
 				</div>
-
 
 				<div class="row">
 					<div class="col-xs-6">
