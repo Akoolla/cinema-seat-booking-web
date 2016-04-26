@@ -58,11 +58,33 @@
 										.addClass("has-error");
 								$("#emailIcon").addClass("glyphicon-remove");
 							}
+							updateBookingState();
 						});
 				
-				$("#standard").on("change", function(){ validateSeats(); updateTotalCost();});
-				$("#wheelchairs").on("change", function(){ validateSeats(); updateTotalCost();});
-				$("#concessions").on("change", function(){ validateSeats(); updateTotalCost();});
+				$("#bookedName").on(
+						"change",
+						function() {
+							$("#bookedNameIcon").removeClass("hidden").removeClass(
+									"glyphicon-ok").removeClass(
+									"glyphicon-remove");
+							if (validateAsName($(this).val())) {
+								$("#bookedNameGrp")
+										.removeClass("has-error")
+										.addClass("has-success");
+								$("#bookedNameIcon").addClass("glyphicon-ok");
+							} else {
+								$("#bookedNameGrp")
+										.removeClass("has-success")
+										.addClass("has-error");
+								$("#bookedNameIcon")
+										.addClass("glyphicon-remove");
+							}
+							updateBookingState();
+						});
+				
+				$("#standard").on("change", function(){ validateSeats(); updateTotalCost(); updateBookingState(); });
+				$("#wheelchairs").on("change", function(){ validateSeats(); updateTotalCost(); updateBookingState(); });
+				$("#concessions").on("change", function(){ validateSeats(); updateTotalCost(); updateBookingState(); });
 				
 				loadScreening();
 				});
@@ -78,6 +100,32 @@
 		});
 	}
 	
+	//Enables booking to be completed from form	
+	function updateBookingState(){
+		var fieldsAreValid = true;
+		//fieldsAreValid = validateEmail($("#email").val());
+		//fieldsAreValid = validateName() & validateAsName($("#bookedName").val());
+		//fieldsAreValid = fieldsAreValid & validateSeats();
+		
+		if(fieldsAreValid){
+			var seats = 0;
+			seats = seats + $("#standard").val().length == 0 ? seats : parseInt($("#standard").val());
+			seats = seats + $("#concessions").val().length == 0 ? seats : parseInt($("#standard").val());
+			seats = seats + $("#wheelchairs").val().length == 0 ? seats : parseInt($("#standard").val());
+			fieldsAreValid = fieldsAreValid & seats > 0;
+		}
+		
+		if(fieldsAreValid){
+			$("#bookBtn").removeClass("disabled");
+		} else {
+			$("#bookBtn").addClass("disabled");
+		}
+	}
+	
+	function validateName(){
+		return true;
+	}
+	
 	function validateSeats(){
 		var standardSeatsToBook = 0;
 		var wheelChairsToBook = 0;
@@ -86,9 +134,15 @@
 		standardSeatsToBook = standardSeatsToBook + parseInt(($.isNumeric($("#concessions").val()) ? $("#concessions").val() : 0));
 		wheelChairsToBook = wheelChairsToBook + parseInt(($.isNumeric($("#wheelchairs").val()) ? $("#wheelchairs").val() : 0));
 		
-		setValidityOfSeat(($("#standard").val().length === 0 || $.isNumeric($("#standard").val())) && standardSeatsToBook <= standardSpaces, "standard");
-		setValidityOfSeat(($("#concessions").val().length === 0 || $.isNumeric($("#concessions").val())) && standardSeatsToBook <= standardSpaces, "concessions");
-		setValidityOfSeat(($("#wheelchairs").val().length === 0 || $.isNumeric($("#wheelchairs").val())) && wheelChairsToBook <= wheelChairSpaces, "wheelchairs");
+		var standardValid = ($("#standard").val().length === 0 || $.isNumeric($("#standard").val())) && standardSeatsToBook <= standardSpaces;
+		var concessionsValid =  ($("#concessions").val().length === 0 || $.isNumeric($("#concessions").val())) && standardSeatsToBook <= standardSpaces;
+		var wheelChairsValid = ($("#wheelchairs").val().length === 0 || $.isNumeric($("#wheelchairs").val())) && wheelChairsToBook <= wheelChairSpaces;
+		
+		setValidityOfSeat(standardValid, "standard");
+		setValidityOfSeat(concessionsValid, "concessions");
+		setValidityOfSeat(wheelChairsValid, "wheelchairs");
+		
+		return standardValid & concessionsValid & wheelChairsValid;
 	}
 	
 	function updateTotalCost(){
@@ -147,13 +201,17 @@
 					<p class="form-control-static">What We Do In The Shadows (15) -
 						Friday, Apr 1st 8:30pm</p>
 				</div>
-
-				<div class="form-group">
-					<label for="name" class="control-label">Name</label> <input
-						class="form-control" type="text" placeholder="Please enter name"
-						id="name" name="name">
-
+				
+				<div class="form-group has-feedback" id="bookedNameGrp">
+					<label for="bookedName" class="control-label">Name</label> <input
+						class="form-control" type="text"
+						placeholder="Please enter email address" id="bookedName" name="bookedName"
+						aria-describedby="bookedNameSuccessStatus"> <span
+						class="glyphicon glyphicon-ok form-control-feedback hidden"
+						aria-hidden="true" id="bookedNameIcon"></span> <span
+						id="bookedNameSuccessStatus" class="sr-only">(success)</span>
 				</div>
+				
 				<div class="form-group has-feedback" id="emailGrp">
 					<label for="email" class="control-label">Email</label> <input
 						class="form-control" type="text"
@@ -217,7 +275,7 @@
 						</div>
 					</div>
 					<div class="col-xs-6">
-						<button type="submit" class="btn btn-primary">Book Seats</button>
+						<button type="submit" class="btn btn-primary disabled" id="bookBtn">Book Seats</button>
 					</div>
 				</div>
 			</form>
