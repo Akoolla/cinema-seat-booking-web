@@ -103,15 +103,23 @@
 	//Enables booking to be completed from form	
 	function updateBookingState(){
 		var fieldsAreValid = true;
-		//fieldsAreValid = validateEmail($("#email").val());
-		//fieldsAreValid = validateName() & validateAsName($("#bookedName").val());
-		//fieldsAreValid = fieldsAreValid & validateSeats();
+		fieldsAreValid = validateEmail($("#email").val());
+		fieldsAreValid = fieldsAreValid & validateAsName($("#bookedName").val());
 		
 		if(fieldsAreValid){
 			var seats = 0;
-			seats = seats + $("#standard").val().length == 0 ? seats : parseInt($("#standard").val());
-			seats = seats + $("#concessions").val().length == 0 ? seats : parseInt($("#standard").val());
-			seats = seats + $("#wheelchairs").val().length == 0 ? seats : parseInt($("#standard").val());
+			if($("#standard").val().length > 0){
+				seats = seats + parseInt($("#standard").val());
+			}
+						
+			if($("#concessions").val().length > 0){
+				seats = seats + parseInt($("#concessions").val());
+			}
+		
+			if($("#wheelchairs").val().length > 0){
+				seats = seats + parseInt($("#wheelchairs").val());
+			}
+
 			fieldsAreValid = fieldsAreValid & seats > 0;
 		}
 		
@@ -121,10 +129,7 @@
 			$("#bookBtn").addClass("disabled");
 		}
 	}
-	
-	function validateName(){
-		return true;
-	}
+
 	
 	function validateSeats(){
 		var standardSeatsToBook = 0;
@@ -167,17 +172,26 @@
 	}
 	
 	function setValidityOfSeat(isValid, idPrefix){
+		var lengthGreateThanZero = $("#" + idPrefix).val().length > 0;
+		var hasNonZeroValue = lengthGreateThanZero & parseInt($("#" + idPrefix).val()) > 0;
+		
+		$("#" + idPrefix + "Grp")
+			.removeClass("has-error")
+			.removeClass("has-success");
+		
 		$("#" + idPrefix + "Icon")
 			.removeClass("hidden")
 			.removeClass("glyphicon-ok")
 			.removeClass("glyphicon-remove");
 				
-		if(isValid){
-			$("#" + idPrefix + "Grp").removeClass("has-error").addClass("has-success");
-			$("#" + idPrefix + "Icon").addClass("glyphicon-ok");
-		} else {
-			$("#" + idPrefix + "Grp").removeClass("has-success").addClass("has-error");
-			$("#" + idPrefix + "Icon").addClass("glyphicon-remove");
+		if(hasNonZeroValue){
+			if(isValid){
+				$("#" + idPrefix + "Grp").removeClass("has-error").addClass("has-success");
+				$("#" + idPrefix + "Icon").addClass("glyphicon-ok");
+			} else {
+				$("#" + idPrefix + "Grp").removeClass("has-success").addClass("has-error");
+				$("#" + idPrefix + "Icon").addClass("glyphicon-remove");
+			}
 		}
 	}
 	
