@@ -33,7 +33,7 @@
 		
 		$("#screeningName").append(data.screeningName);
 		$("#rating").append(data.screeningRating);
-		$("#dateAndTime").append(data.screeningDataAndTime);
+		$("#dateAndTime").append(data.screeningDateAndTime);
 		$("#bookingRef").append(data.bookingRef);
 		$("#bookedPrice").append(data.priceInPence/100);//TODO convert to pounds
 	}
@@ -220,22 +220,24 @@
 <body>
 	<div id="nav"></div>
 	<div class="container">
-		<div class="hidden" id="bookingMade">
+		<div class="hidden alert alert-success" role="alert" id="bookingMade">
 			<div class="row">
 				<div class="col-md-12">
-					Your Booking has been made for <span id="screeningName"></span>
+					<p>
+					Your Booking has been made for <strong><span id="screeningName"></span>
 					<span id="rating"></span>
-					&nbsp;<span id="dateAndTime"></span>
+					&nbsp;<span id="dateAndTime"></span></strong>
+					</p>
 				</div>
 			</div>
 			<div class="row">
 				<div class="col-md-6">
-					Booking reference is <span id="bookingRef">32123213213</span>
+					<p>Booking reference is <strong id="bookingRef">32123213213</strong></p>
 				</div>
 			</div>
 			<div class="row">
 				<div class="col-md-6">
-					Total Price is £<span id="bookedPrice"></span>
+					<p>Total Price is <strong>£<span id="bookedPrice"></span></strong></p>
 				</div>
 			</div>
 		</div>
