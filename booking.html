@@ -26,6 +26,17 @@
 	$(function() {
 		$("#nav").load("nav.html");
 	});
+	
+	function bookingMade(data){
+		$("#bookingForm").addClass("hidden");
+		$("#bookingMade").removeClass("hidden");
+		
+		$("#screeningName").append(data.screeningName);
+		$("#rating").append(data.screeningRating);
+		$("#dateAndTime").append(data.screeningDataAndTime);
+		$("#bookingRef").append(data.bookingRef);
+		$("#bookedPrice").append(data.priceInPence/100);//TODO convert to pounds
+	}
 
 	$(document).ready(
 			function() {
@@ -33,12 +44,13 @@
 
 				//Set-up add person form
 				var options = {
-					url : '/booking/make/',
+					url : restService + 'screening/213123/book',
 					dataType : 'jsonp',
 					jsonp : 'json.wrf',
 					type : 'post',
 					clearForm : true,
-					timeout : 3000
+					timeout : 3000,
+					success: bookingMade
 				};
 
 				$('#makeBooking').ajaxForm(options);
@@ -208,7 +220,26 @@
 <body>
 	<div id="nav"></div>
 	<div class="container">
-		<div class="col-md-4">
+		<div class="hidden" id="bookingMade">
+			<div class="row">
+				<div class="col-md-12">
+					Your Booking has been made for <span id="screeningName"></span>
+					<span id="rating"></span>
+					&nbsp;<span id="dateAndTime"></span>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6">
+					Booking reference is <span id="bookingRef">32123213213</span>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6">
+					Total Price is £<span id="bookedPrice"></span>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-4" id="bookingForm">
 			<form class="form-horizontal" id="makeBooking" method="post">
 				<div class="form-group">
 					<label>Booking for:</label>
@@ -238,7 +269,7 @@
 
 				<div class="form-group">
 					<div class="checkbox">
-						<label> <input type="checkbox" value=""> Tick if a
+						<label> <input type="checkbox" value="true" id="isMember"> Tick if a
 							member
 						</label>
 					</div>
@@ -295,11 +326,5 @@
 			</form>
 		</div>
 	</div>
-
-	<script>
-		$('email').on('change', function() {
-			alert(this.value);
-		});
-	</script>
 </body>
 </html>
