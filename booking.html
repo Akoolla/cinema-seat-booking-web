@@ -43,6 +43,8 @@
 		$("#rating").append(data.screeningRating);
 		$("#dateAndTime").append(data.screeningDateAndTime);
 		$("#bookingRef").append(data.bookingRef);
+		$("#stdSeatsBooked").append(data.seatsBooked);
+		$("#wheelChairsBooked").append(data.wheelChairsBooked);
 	}
 
 	$(document).ready(
@@ -212,7 +214,8 @@
 				<div class="col-md-12">
 					<p>
 					Your Booking has been made for <strong><span id="screeningName"></span>
-					()<span id="rating"></span>) on <span id="dateAndTime"></span></strong>
+					(<span id="rating"></span>) on <span id="dateAndTime"></span></strong> for <strong><span id="stdSeatsBooked"></span> 
+					seats</strong> and <strong><span id="wheelChairsBooked"></span> wheelchair(s)</strong>.
 					</p>
 				</div>
 			</div>
