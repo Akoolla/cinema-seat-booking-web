@@ -3,21 +3,114 @@
 <head>
 <meta charset="UTF-8">
 <title>Axbridge Roxy - Cancel Booking</title>
-	<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
-	<META HTTP-EQUIV="Expires" CONTENT="-1">
-	<META NAME="viewport" CONTENT="initial-scale=1">
-	<link href="css/bootstrap.min.css" rel="stylesheet" />
+<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+<META HTTP-EQUIV="Expires" CONTENT="-1">
+<link href="css/bootstrap.min.css" rel="stylesheet" />
+
+<script src="js/jquery/jquery-1.11.2.min.js"></script>
+<script src="js/jquery/jquery.form.min.js" charset="utf-8"></script>
+<script src="js/bootstrap.min.js"></script>
+
+<script>
+	var restService = "http://localhost:8080/";
+
+	$(function() {
+		$("#nav").load("nav.html");
+	});
 	
-	<script src="js/jquery/jquery-1.11.2.min.js"></script>
-	<script src="js/bootstrap.min.js"></script>
+	$(document).ready(
+			function() {
+				$("#cancelBooking").submit(function(event) {
+					if(formIsValid()){
+						//vent.preventDefault();
+					} else {
+						event.preventDefault();
+					}
+				})
+				
+				//Set-up form
+				var options = {
+					url : restService + '/booking/cancel',
+					dataType : 'jsonp',
+					jsonp : 'json.wrf',
+					type : 'post',
+					clearForm : true,
+					timeout : 3000,
+					success: bookingCancelled,
+					statusCode : {
+						500: function() {bookingNotFound;}
+					}
+				};
+				$('#cancelBooking').ajaxForm(options);
+								
+				$("#ref").on("change",
+						function() {
+							$("#refIcon")
+								.removeClass("hidden")
+								.removeClass("glyphicon-ok")
+								.removeClass("glyphicon-remove");
+						
+							var reg = /^[0-9a-zA-Z]+$/;
+							if (formIsValid()){
+								$("#refGrp")
+									.removeClass("has-error")
+									.addClass("has-success");
+								$("#refIcon")
+									.addClass("glyphicon-ok");
+								$("#cancelBtn").removeClass("disabled");
+							} else {
+								$("#refGrp")
+									.removeClass("has-sucess")
+									.addClass("has-error");
+								$("#refIcon")
+									.addClass("glyphicon-remove");
+								$("#cancelBtn").addClass("disabled");
+							}
+				});
+			});
 	
-	<script> 
-    $(function(){
-      $("#nav").load("nav.html"); 
-    });
-    </script>
+	function bookingCancelled(data){
+		$("#cancelBooking").empty();
+		$("#cancelBooking").addClass("hidden");
+		$("#bookingCancelled").removeClass("hidden");
+	}
+	
+	function bookingNotFound(data){
+		$("#ref").empty();
+	}
+	
+	function formIsValid(){
+		var reg = /^[0-9a-zA-Z]+$/;
+		return reg.test($("#ref").val());
+	}
+</script>
 </head>
 <body>
 	<div id="nav"></div>
+	<div class="container">
+		<div class="row" id="cancelBooking">
+			<form class="form-horizontal" id="cancelBooking" method="post">
+				<div class="row">
+					<div class="col-md-4">
+						<div class="form-group has-feedback" id="refGrp">
+							<label for="ref" class="control-label hidden">Booking Reference</label> <input
+								class="form-control" type="text"
+								placeholder="Please enter reference" id="ref" name="ref"
+								aria-describedby="refSuccessStatus"> <span
+								class="glyphicon glyphicon-ok form-control-feedback hidden"
+								aria-hidden="true" id="refIcon"></span> <span
+								id="refSuccessStatus" class="sr-only">(success)</span>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<button type="submit" class="btn btn-primary disabled" id="cancelBtn">Cancel Booking</button>
+				</div>
+			</form>
+		</div>
+		<div class="row hidden" id="bookingCancelled">
+			Cancelled
+		</div>
+	</div>
 </body>
 </html>
