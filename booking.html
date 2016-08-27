@@ -13,20 +13,27 @@
 <script src="js/bootstrap.min.js"></script>
 <script src="js/validation.js"></script>
 <script src="js/bookings.js"></script>
+<script src="js/restconnection.js"></script>
 
 <script>
-	var restService = "http://178.62.30.126/cinema-rest/";
-	var wheelChairPrice1;
-	var standardPrice;
-	var concessionCost;
-	
 	var wheelChairSpaces;
 	var standardSpaces;
-	var concessionSpaces;
 
 	$(function() {
 		$("#nav").load("nav.html");
 	});
+	
+	function getUrlVars() {
+		var vars = [], hash;
+		var hashes = window.location.href.slice(
+				window.location.href.indexOf('?') + 1).split('&');
+		for (var i = 0; i < hashes.length; i++) {
+			hash = hashes[i].split('=');
+			vars.push(hash[0]);
+			vars[hash[0]] = hash[1];
+		}
+		return vars;
+	}
 	
 	function bookingMade(data){
 		$("#bookingForm").addClass("hidden");
@@ -36,16 +43,17 @@
 		$("#rating").append(data.screeningRating);
 		$("#dateAndTime").append(data.screeningDateAndTime);
 		$("#bookingRef").append(data.bookingRef);
-		$("#bookedPrice").append(data.priceInPence/100);//TODO convert to pounds
 	}
 
 	$(document).ready(
 			function() {
+				var screeningRef = getUrlVars().screeningRef;
+				
 				$("#nav").load("nav.html");
 
 				//Set-up add person form
 				var options = {
-					url : restService + 'screening/213123/book',
+					url : restService + 'screening/' + screeningRef + '/book',
 					dataType : 'jsonp',
 					jsonp : 'json.wrf',
 					type : 'post',
@@ -95,16 +103,15 @@
 							updateBookingState();
 						});
 				
-				$("#standard").on("change", function(){ validateSeats(); updateTotalCost(); updateBookingState(); });
-				$("#wheelchairs").on("change", function(){ validateSeats(); updateTotalCost(); updateBookingState(); });
-				$("#concessions").on("change", function(){ validateSeats(); updateTotalCost(); updateBookingState(); });
+				$("#standard").on("change", function(){ validateSeats(); updateBookingState(); });
+				$("#wheelchairs").on("change", function(){ validateSeats(); updateBookingState(); });
 				
-				loadScreening();
+				loadScreening(screeningRef);
 				});
 	
-	function loadScreening(){
+	function loadScreening(screeningRef){
 		$.ajax({
-			'url' : restService + 'screening/2131',
+			'url' : restService + 'screening/' + screeningRef,
 			'success' : function(data) {
 				populateScreeningData(data);
 			},
@@ -124,11 +131,7 @@
 			if($("#standard").val().length > 0){
 				seats = seats + parseInt($("#standard").val());
 			}
-						
-			if($("#concessions").val().length > 0){
-				seats = seats + parseInt($("#concessions").val());
-			}
-		
+				
 			if($("#wheelchairs").val().length > 0){
 				seats = seats + parseInt($("#wheelchairs").val());
 			}
@@ -149,39 +152,15 @@
 		var wheelChairsToBook = 0;
 		
 		standardSeatsToBook = standardSeatsToBook + parseInt(($.isNumeric($("#standard").val()) ? $("#standard").val() : 0));
-		standardSeatsToBook = standardSeatsToBook + parseInt(($.isNumeric($("#concessions").val()) ? $("#concessions").val() : 0));
 		wheelChairsToBook = wheelChairsToBook + parseInt(($.isNumeric($("#wheelchairs").val()) ? $("#wheelchairs").val() : 0));
 		
 		var standardValid = ($("#standard").val().length === 0 || $.isNumeric($("#standard").val())) && standardSeatsToBook <= standardSpaces;
-		var concessionsValid =  ($("#concessions").val().length === 0 || $.isNumeric($("#concessions").val())) && standardSeatsToBook <= standardSpaces;
 		var wheelChairsValid = ($("#wheelchairs").val().length === 0 || $.isNumeric($("#wheelchairs").val())) && wheelChairsToBook <= wheelChairSpaces;
 		
 		setValidityOfSeat(standardValid, "standard");
-		setValidityOfSeat(concessionsValid, "concessions");
 		setValidityOfSeat(wheelChairsValid, "wheelchairs");
 		
-		return standardValid & concessionsValid & wheelChairsValid;
-	}
-	
-	function updateTotalCost(){
-		var totalCost = 0;
-
-		if($.isNumeric($("#standard").val())){
-			totalCost = totalCost + (parseInt($("#standard").val()) * standardPrice);
-		}
-		if($.isNumeric($("#wheelchairs").val())){
-			totalCost = totalCost + (parseInt($("#wheelchairs").val()) * wheelChairPrice);
-		}
-		if($.isNumeric($("#concessions").val())){
-			totalCost = totalCost + (parseInt($("#concessions").val()) * concessionCost);
-		}
-
-		pence = totalCost % 100;
-		pounds = (totalCost / 100) - (pence/100);
-		
-		$("#costPounds").val(pounds);
-		$("#costPence").empty();
-		$("#costPence").append("." + pence);
+		return standardValid & wheelChairsValid;
 	}
 	
 	function setValidityOfSeat(isValid, idPrefix){
@@ -209,12 +188,19 @@
 	}
 	
 	function populateScreeningData(data){
-		wheelChairPrice = data.screening.wheelChairPrice;
-		standardPrice = data.screening.standardPrice;
-		concessionCost = data.screening.concessionCost;
+		var screening = data.screening;
+		console.log(screening)
 		
-		wheelChairSpaces = data.screening.wheelChairSpaces;
-		standardSpaces = data.screening.standardSpaces;
+		$("#filmInfo").empty();
+		$("#filmInfo").append(
+			screening.filmTitle
+			+ "(" + screening.rating + ")"
+			+ " - "
+			+ screening.dateTime
+		);
+		
+		wheelChairSpaces = data.screening.availableWheelChairSpaces;
+		standardSpaces = data.screening.availableSeats;
 	}
 </script>
 </head>
@@ -226,8 +212,7 @@
 				<div class="col-md-12">
 					<p>
 					Your Booking has been made for <strong><span id="screeningName"></span>
-					<span id="rating"></span>
-					&nbsp;<span id="dateAndTime"></span></strong>
+					()<span id="rating"></span>) on <span id="dateAndTime"></span></strong>
 					</p>
 				</div>
 			</div>
@@ -236,18 +221,12 @@
 					<p>Booking reference is <strong id="bookingRef">32123213213</strong></p>
 				</div>
 			</div>
-			<div class="row">
-				<div class="col-md-6">
-					<p>Total Price is <strong>£<span id="bookedPrice"></span></strong></p>
-				</div>
-			</div>
 		</div>
 		<div class="col-md-4" id="bookingForm">
 			<form class="form-horizontal" id="makeBooking" method="post">
 				<div class="form-group">
 					<label>Booking for:</label>
-					<p class="form-control-static">What We Do In The Shadows (15) -
-						Friday, Apr 1st 8:30pm</p>
+					<p class="form-control-static" id="filmInfo"></p>
 				</div>
 				
 				<div class="form-group has-feedback" id="bookedNameGrp">
@@ -270,33 +249,14 @@
 						id="emailSuccessStatus" class="sr-only">(success)</span>
 				</div>
 
-				<div class="form-group">
-					<div class="checkbox">
-						<label> <input type="checkbox" value="true" id="isMember"> Tick if a
-							member
-						</label>
-					</div>
-				</div>
-
-
 				<div class="form-group has-feedback" id="standardGrp">
-					<label for="standard" class="control-label">Number of Standard Seats</label> <input
+					<label for="standard" class="control-label">Number of Seats</label> <input
 						class="form-control" type="text" 
 						placeholder="0" id="standard" name="standard" 
 						aria-describedby="standardSuccessStatus"> <span 
 						class="glyphicon glyphicon-ok form-control-feedback hidden"
 						aria-hidden="true" id="standardIcon"></span> 
 						<span id="standardSuccessStatus" class="sr-only">(success)</span>
-				</div>
-
-				<div class="form-group has-feedback" id="concessionsGrp">
-					<label for="concessions" class="control-label">Number of Concession Seats</label> <input
-						class="form-control" type="text" 
-						placeholder="0" id="concessions" name="concessions" 
-						aria-describedby="concessionsSuccessStatus"> <span 
-						class="glyphicon glyphicon-ok form-control-feedback hidden"
-						aria-hidden="true" id="concessionsIcon"></span> 
-						<span id="concessionsSuccessStatus" class="sr-only">(success)</span>
 				</div>
 				
 				<div class="form-group has-feedback" id="wheelchairsGrp">
@@ -310,21 +270,12 @@
 				</div>
 
 				<div class="row">
-					<div class="col-xs-6">
-						<div class="form-group">
-							<label class="sr-only" for="exampleInputAmount">0
-								(in pounds)</label>
-							<div class="input-group">
-								<div class="input-group-addon">£</div>
-								<input type="text" class="form-control" id="costPounds"
-									placeholder="0" readonly>
-								<div class="input-group-addon" id="costPence">.00</div>
-							</div>
-						</div>
-					</div>
-					<div class="col-xs-6">
+					<div>
 						<button type="submit" class="btn btn-primary disabled" id="bookBtn">Book Seats</button>
 					</div>
+				</div>
+				<div class="row">
+					<div>&nbsp;</div>
 				</div>
 			</form>
 		</div>

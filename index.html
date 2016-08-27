@@ -6,19 +6,53 @@
 	<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
 	<META HTTP-EQUIV="Expires" CONTENT="-1">
 	<link href="css/bootstrap.min.css" rel="stylesheet" />
-	<META NAME="viewport" CONTENT="initial-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<script src="js/jquery/jquery-1.11.2.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
+	<script src="js/restconnection.js"></script>
 	
 	<script> 
-    $(function(){
-      $("#nav").load("nav.html"); 
-    });
+    $(document).ready(
+			function() {
+				$("#nav").load("nav.html");
+				$.ajax({
+					'url' : restService + 'screening/',
+					'success' : function(data) {
+						populateScreeningData(data);
+					},
+					'dataType' : 'jsonp',
+					'jsonp' : 'json.wrf'
+				});
+			});
+    
+    function populateScreeningData(data){
+    	for (i = 0; i < data.screenings.length; i++) {
+    		var screening = data.screenings[i];
+    		
+    		$("#screeningList").append(
+        			"<li class='list-group-item'>"
+        			+ "<h4 class='list-group-item-heading'>"
+        				+ screening.filmTitle
+        				+ " (" + screening.rating +  ")"
+        				+ " " + screening.releaseCountry
+        				+ " " + screening.releaseDate
+        				+ " " + screening.filmLengthInMins + " mins"
+        			+ "</h4>"
+        			+ "<h5 class='list-group-item-heading'>"
+        			+ screening.dateTime
+        			+ "</h5>"
+        			+ "<a href='booking.html?screeningRef="
+        					+ screening.ref
+        					+ "' role='button' class='btn btn-primary btn-xs'>Make Booking</a>"
+        			+ "</li>"
+        	);
+		}
+    }
+    
     </script>
 </head>
 <body>
 	<div id="nav"></div>
-	
-	<a href="booking.html">Make booking...</a>
+	<div class="list-group" id="screeningList"></div>
 </body>
 </html>
