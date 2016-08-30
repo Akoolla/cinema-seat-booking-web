@@ -191,14 +191,25 @@
 	
 	function populateScreeningData(data){
 		var screening = data.screening;
+		var wheelChairStyle = screening.availableWheelChairSpaces == 0 ? "label-danger" : "label-success";
+		var seatsStyle = screening.availableSeats == 0 ? "label-danger" : "label-success";
+		
 		console.log(screening)
 		
 		$("#filmInfo").empty();
 		$("#filmInfo").append(
-			screening.filmTitle
-			+ "(" + screening.rating + ")"
-			+ " - "
+			+ "<h4 class='list-group-item-heading'>"
+			+ screening.filmTitle
+			+ " (" + screening.rating +  ")"
+			+ " " + screening.releaseCountry
+			+ " " + screening.releaseDate
+			+ " " + screening.filmLengthInMins + " mins"
+			+ "</h4>"
+			+ "<h5 class='list-group-item-heading'>"
 			+ screening.dateTime
+			+ "</h5>"
+			+ "<p><span class='label " + seatsStyle + "'>Seats left <span class='badge'>" + screening.availableSeats + "</span></span>"
+			+ "&nbsp;<span class='label " + wheelChairStyle + "'>Wheelchair spaces <span class='badge'>" + screening.availableWheelChairSpaces + "</span></span></p>"
 		);
 		
 		wheelChairSpaces = data.screening.availableWheelChairSpaces;
@@ -229,7 +240,8 @@
 			<form class="form-horizontal" id="makeBooking" method="post">
 				<div class="form-group">
 					<label>Booking for:</label>
-					<p class="form-control-static" id="filmInfo"></p>
+					<p class="form-control-static" id="filmInfo">
+					</p>
 				</div>
 				
 				<div class="form-group has-feedback" id="bookedNameGrp">

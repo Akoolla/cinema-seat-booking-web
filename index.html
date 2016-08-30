@@ -28,6 +28,15 @@
     function populateScreeningData(data){
     	for (i = 0; i < data.screenings.length; i++) {
     		var screening = data.screenings[i];
+    		var bookingBtnMsg = "Make Booking"
+    		var disabledStyle;
+    		var wheelChairStyle = screening.availableWheelChairSpaces == 0 ? "label-danger" : "label-success";
+    		var seatsStyle = screening.availableSeats == 0 ? "label-danger" : "label-success";
+    		
+    		if(screening.fullyBooked){
+    			bookingBtnMsg = "Fully Booked";
+    			disabledStyle = " disabled";
+    		}
     		
     		$("#screeningList").append(
         			"<li class='list-group-item'>"
@@ -41,9 +50,16 @@
         			+ "<h5 class='list-group-item-heading'>"
         			+ screening.dateTime
         			+ "</h5>"
+        			+ "<p><span class='label " + seatsStyle + "'>Seats left <span class='badge'>" + screening.availableSeats + "</span></span>"
+        			+ "&nbsp;<span class='label " + wheelChairStyle + "'>Wheelchair spaces <span class='badge'>" + screening.availableWheelChairSpaces + "</span></span></p>"
+        			
         			+ "<a href='booking.html?screeningRef="
         					+ screening.ref
-        					+ "' role='button' class='btn btn-primary btn-xs'>Make Booking</a>"
+        					+ "' role='button' class='btn btn-primary btn-xs"
+        					+ disabledStyle
+        					+ "'>"
+        					+ bookingBtnMsg
+        					+ "</a>"
         			+ "</li>"
         	);
 		}
