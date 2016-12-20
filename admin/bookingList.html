@@ -15,13 +15,22 @@
 		$("#nav").load("nav.html");
 		loadBookings(getUrlVars().screeningRef);
 	});
-	
-	
-	function loadBookings(screeningRef){
+
+	function loadBookings(screeningRef) {
 		$("#bookings").empty();
 		$.ajax({
 			'url' : restService + '/screening/' + screeningRef + '/bookings',
 			'success' : function(data) {
+				$("#filmName").empty();
+				$("#filmName").append(data.filmName);
+				
+				$("#seats").empty();
+				$("#seats").append(data.numOfBookedSeats);
+				
+				$("#wheelChairs").empty();
+				$("#wheelChairs").append(data.numOfBookedWheelChairs);
+				
+				
 				populateBookings(screeningRef, data);
 			},
 			'dataType' : 'jsonp',
@@ -29,26 +38,39 @@
 		});
 	}
 
-	function populateBookings(ref,data) {
+	function populateBookings(ref, data) {
 		for (i = 0; i < data.bookings.length; i++) {
 			var booking = data.bookings[i];
 			console.log(booking);
-			
-			$("#bookings").append(
-					'<tr>'
-						+ '<th>' + booking.ref + '</th>'
-						+ '<td>' + booking.name + '</td>'
-						+ '<td>' + booking.date + '</td>'
-						+ '<td>' + booking.seats + '</td>'
-						+ '<td>' + booking.wheelchairs + '</td>'
-						+ '<td>' + "dsdsd" + "</td>"
-						+ '<td><button class="btn btn-danger btn-xs" onClick="cancelBooking(\'' + ref +  '\',\'' + booking.ref + '\')">Cancel Booking</button></td>'
-					+ '</tr>'
-			);
+
+			$("#bookings")
+					.append(
+							'<tr>' + '<td>'
+									+ booking.name
+									+ '</td>'
+									+ '<td>'
+									+ booking.date
+									+ '</td>'
+									+ '<td>'
+									+ booking.seats
+									+ '</td>'
+									+ '<td>'
+									+ booking.wheelchairs
+									+ '</td>'
+									+ '<td>'
+									+ booking.email
+									+ '</td>'
+									+ '<td>'
+									+ booking.telNo
+									+ '</td>'
+									+ '<td><button class="btn btn-danger btn-xs" onClick="cancelBooking(\''
+									+ ref + '\',\'' + booking.ref
+									+ '\')">Cancel Booking</button></td>'
+									+ '</tr>');
 		}
 	}
-	
-	function cancelBooking(screeningRef, bookingRef){
+
+	function cancelBooking(screeningRef, bookingRef) {
 		$.ajax({
 			'url' : restService + '/booking/cancel?ref=' + bookingRef,
 			'success' : function(data) {
@@ -58,7 +80,7 @@
 			'jsonp' : 'json.wrf'
 		});
 	}
-	
+
 	function getUrlVars() {
 		var vars = [], hash;
 		var hashes = window.location.href.slice(
@@ -75,20 +97,33 @@
 <body>
 	<div id="nav"></div>
 	<div class="container">
-		<table class="table">
-			<thead>
-				<tr>
-					<th>Ref</th>
-					<th>Name</th>
-					<th>Date</th>
-					<th>Seats</th>
-					<th>WheelChairs</th>
-					<th>&nbsp;</th>
-				</tr>
-			</thead>
-			<tbody id="bookings">
-				
-			</tbody>
-		</table>
+		<div class="row">
+			<div class="col-md-12">
+				<h4>Film Name: <span id="filmName"></span></h4>
+				<h4>Number booked Seats: <span id="seats"></span></h4>
+				<h4>Number of booked wheel chairs: <span id="wheelChairs"></span></h4>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-md-12">
+				<table class="table">
+					<thead>
+						<tr>
+							<th>Name</th>
+							<th>Date</th>
+							<th>Seats</th>
+							<th>WheelChairs</th>
+							<th>Email</th>
+							<th>Tel No.</th>
+							<th>&nbsp;</th>
+						</tr>
+					</thead>
+					<tbody id="bookings">
+
+					</tbody>
+				</table>
+			</div>
+		</div>
 	</div>
 </body>

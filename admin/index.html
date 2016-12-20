@@ -15,7 +15,7 @@
 			function() {
 				$("#nav").load("nav.html");
 				$.ajax({
-					'url' : restService + 'screening/',
+					'url' : restService + 'screening/all/',
 					'success' : function(data) {
 						populateScreeningData(data);
 					},

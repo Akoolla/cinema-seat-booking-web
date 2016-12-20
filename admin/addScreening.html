@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Axbridge Roxy - Bookings</title>
+	<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+	<META HTTP-EQUIV="Expires" CONTENT="-1">
+	<link href="css/bootstrap.min.css" rel="stylesheet" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script src="js/jquery/jquery-1.11.2.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/restconnection.js"></script>	
+</head>
+
+<body>
+	<div id="nav"></div>
+	<div class="container">
+		<div class="col-md-4" id="screeningForm">
+			<form class="form-horizontal" id="addScreening" method="post" action="http://localhost:8080/screening/add/">
+				<div class="form-group">
+					<label for="name" class="control-label"></label> 
+					<input
+						class="form-control" type="text"
+						placeholder="Film Name" id="name" name="name"> 
+				</div>
+				<div class="form-group">
+					<label for="date" class="control-label"></label> 
+					<input
+						class="form-control" type="text"
+						placeholder="Screening time (dd-MM-yyyy-H-mm)" id="date" name="date"> 
+				</div>
+				<div class="form-group">
+					<label for="rating" class="control-label"></label> 
+					<input
+						class="form-control" type="text"
+						placeholder="Film Rating" id="rating" name="rating"> 
+				</div>
+				<div class="form-group">
+					<label for="releaseDate" class="control-label"></label> 
+					<input
+						class="form-control" type="text"
+						placeholder="Release Date" id="releaseDate" name="releaseDate"> 
+				</div>
+				<div class="form-group">
+					<label for="length" class="control-label"></label> 
+					<input
+						class="form-control" type="text"
+						placeholder="Length" id="length" name="length"> 
+				</div>
+				<div class="form-group">
+					<label for="country" class="control-label"></label> 
+					<input
+						class="form-control" type="text"
+						placeholder="country" id="" name="country"> 
+				</div>
+				<div class="form-group">
+					<label for="maxSeats" class="control-label"></label> 
+					<input
+						class="form-control" type="text"
+						placeholder="Max Seats" id="maxSeats" name="maxSeats"> 
+				</div>
+				<div class="form-group">
+					<label for="maxWheelChairs" class="control-label"></label> 
+					<input
+						class="form-control" type="text"
+						placeholder="maxWheelChairs" id="maxWheelChairs" name="maxWheelChairs"> 
+				</div>
+				<div class="form-group">
+					<input
+						class="form-control" type="text"
+						placeholder="json.wrf" id="json.wrf" name="json.wrf"> 
+				</div>
+				
+				<div class="row">
+					<div>
+						<button type="submit" class="btn btn-primary" id="bookBtn">Add Screening</button>
+					</div>
+				</div>
+			</form>
+	</div>
+</body>
